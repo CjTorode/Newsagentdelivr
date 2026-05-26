@@ -786,7 +786,7 @@ footer {
       <li><a href="#features">Features</a></li>
       <li><a href="#how">How it works</a></li>
       <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#signup" class="nav-cta">Start Free Trial</a></li>
+      <li><a href="#" onclick="startTrial('Pro');return false;" class="nav-cta">Start Free Trial</a></li>
     </ul>
   </div>
 </nav>
@@ -1018,7 +1018,7 @@ footer {
           <li class="no">Handwritten sheet scanning</li>
           <li class="no">Free setup service</li>
         </ul>
-        <a href="#signup" class="plan-btn">Start free trial</a>
+        <a href="#" onclick="startTrial('Starter');return false;" class="plan-btn">Start free trial</a>
       </div>
       <div class="pricing-card featured">
         <div class="pricing-badge">Most Popular</div>
@@ -1035,8 +1035,7 @@ footer {
           <li>Handwritten sheet scanning</li>
           <li>Free setup service included</li>
         </ul>
-        <a href="#signup" class="plan-btn">Start free trial</a>
-      </div>
+        <a href="#" onclick="startTrial('Pro');return false;" class="plan-btn">Start free trial</a>      </div>
       <div class="pricing-card">
         <div class="plan-name">Setup Only</div>
         <div class="plan-price"><sup>£</sup>65</div>
@@ -1051,7 +1050,7 @@ footer {
           <li class="no">—</li>
           <li class="no">—</li>
         </ul>
-        <a href="#signup" class="plan-btn">Get in touch</a>
+        <a href="#" onclick="startTrial('Setup Only');return false;" class="plan-btn">Get in touch</a>
       </div>
     </div>
     <p class="pricing-note">All plans include a 30-day free trial · No credit card required to start · Cancel any time</p>
@@ -1072,7 +1071,7 @@ footer {
       <p class="form-sub">No spam. We'll only email you when we launch. Unsubscribe any time.</p>
     </div>
     <div id="signup-thanks" style="display:none;margin-top:20px;padding:16px 24px;background:#f3fff3;border:1px solid #80a880;border-radius:4px;font-size:15px;color:#2a5e2a;max-width:480px;margin-left:auto;margin-right:auto">
-      ✓ You're on the list! We'll be in touch when we launch.
+      ✓ Your mail app should have opened with a pre-written message to Craig. Just hit send and we'll be in touch within 24 hours!
     </div>
     <div class="signup-stats">
       <div>
@@ -1099,7 +1098,7 @@ footer {
       <li><a href="#features">Features</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#signup">Sign Up</a></li>
-      <li><a href="mailto:hello@newsagentdelivr.com">Contact</a></li>
+      <li><a href="mailto:Craigpapers@icloud.com">Contact</a></li>
     </ul>
   </div>
   <div class="footer-inner">
@@ -1114,10 +1113,21 @@ function handleSignup(){
     alert('Please enter a valid email address.');
     return;
   }
+  const subject = encodeURIComponent('NewsagentDelivr — Free Trial Request');
+  const body = encodeURIComponent(
+    'Hi Craig,\n\nI\'d like to start a free trial of NewsagentDelivr.\n\nMy email address: ' + email + '\n\nA few details about my business:\n- Business name: \n- Approx number of customers: \n- Do you use Alliance or another distributor? \n\nLooking forward to hearing from you!\n'
+  );
+  window.location.href = 'mailto:Craigpapers@icloud.com?subject=' + subject + '&body=' + body;
   document.querySelector('.form-row').style.display = 'none';
   document.getElementById('signup-thanks').style.display = 'block';
-  // In production this would POST to your backend / Mailchimp / ConvertKit etc
-  console.log('Signup:', email);
+}
+
+function startTrial(plan){
+  const subject = encodeURIComponent('NewsagentDelivr — ' + plan + ' Trial Request');
+  const body = encodeURIComponent(
+    'Hi Craig,\n\nI\'d like to start a free trial of NewsagentDelivr (' + plan + ' plan).\n\nA few details about my business:\n- Business name: \n- Your name: \n- Email address: \n- Phone number (optional): \n- Approx number of customers: \n- Do you use Alliance or another distributor? \n- Any local/regional papers you deliver? \n\nLooking forward to hearing from you!\n'
+  );
+  window.location.href = 'mailto:Craigpapers@icloud.com?subject=' + subject + '&body=' + body;
 }
 
 // Smooth scroll for anchor links
