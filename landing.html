@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NewsagentDelivr — Modern Delivery Management for Independent Newsagents</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink: #0f0e0c;
+  --paper: #f7f4ee;
+  --gold: #c8a84b;
+  --gold-light: #e8d48b;
+  --dark: #1a1a18;
+  --mid: #4a4a44;
+  --rule: #d4cfc4;
+  --red: #c0392b;
+  --green: #2a5e2a;
+  --white: #ffffff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ── NAVIGATION ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(247,244,238,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 5vw;
+}
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mid);
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-cta {
+  background: var(--ink) !important;
+  color: var(--gold) !important;
+  padding: 9px 20px !important;
+  border-radius: 3px;
+  font-weight: 600 !important;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--gold) !important; color: var(--ink) !important; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 5vw 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '🗞';
+  position: absolute;
+  right: -2vw;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(180px, 25vw, 380px);
+  opacity: 0.06;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  border: 1px solid var(--gold);
+  padding: 6px 14px;
+  border-radius: 2px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 24px;
+  color: var(--ink);
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--gold);
+}
+.hero-sub {
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 480px;
+}
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--gold);
+  padding: 15px 32px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--gold); color: var(--ink); transform: translateY(-1px); }
+.btn-secondary {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 2px;
+  transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--gold); }
+.hero-trust {
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--mid);
+  flex-wrap: wrap;
+}
+.hero-trust span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hero-trust span::before {
+  content: '✓';
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* ── MOCK APP PREVIEW ── */
+.app-preview {
+  background: var(--dark);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(200,168,75,0.2);
+  position: relative;
+}
+.app-preview::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 20%; right: 20%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 0 0 3px 3px;
+}
+.app-bar {
+  background: #2c2c2c;
+  border-radius: 4px 4px 0 0;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -20px -20px 16px;
+  border-bottom: 2px solid var(--gold);
+}
+.app-dots { display: flex; gap: 6px; }
+.app-dots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #444;
+}
+.app-dots span:first-child { background: #ff5f57; }
+.app-dots span:nth-child(2) { background: #febc2e; }
+.app-dots span:nth-child(3) { background: #28c840; }
+.app-title-bar {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.app-nav-mock {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+.app-nav-mock span {
+  padding: 7px 12px;
+  font-size: 11px;
+  color: #888;
+  border-radius: 3px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.app-nav-mock span.active {
+  background: var(--gold);
+  color: var(--dark);
+  font-weight: 700;
+}
+.app-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.app-stat {
+  background: #2a2a28;
+  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid #333;
+}
+.app-stat-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.app-stat-val { font-size: 18px; font-weight: 700; color: var(--gold); font-family: 'Playfair Display', serif; }
+.app-stat-sub { font-size: 10px; color: #555; margin-top: 2px; }
+.app-row {
+  background: #2a2a28;
+  border-radius: 3px;
+  padding: 9px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 3px solid transparent;
+}
+.app-row.delivered { border-left-color: #2a5e2a; }
+.app-row.pending { border-left-color: var(--gold); }
+.app-row-name { font-size: 11px; color: #ccc; font-weight: 500; }
+.app-row-detail { font-size: 10px; color: #666; margin-top: 2px; }
+.app-row-amount { font-size: 12px; color: var(--gold); font-weight: 700; }
+
+/* ── SECTION SHARED ── */
+section { padding: 100px 5vw; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  margin-bottom: 20px;
+}
+.section-sub {
+  font-size: 17px;
+  color: var(--mid);
+  font-weight: 300;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+/* ── PROBLEM STRIP ── */
+.problem-strip {
+  background: var(--ink);
+  padding: 60px 5vw;
+}
+.problem-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+.problem-item {
+  border-left: 2px solid #333;
+  padding-left: 24px;
+}
+.problem-item h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.problem-item p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.7;
+}
+.problem-item .strike {
+  color: var(--red);
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* ── FEATURES ── */
+.features-section { background: var(--white); }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 60px;
+  border: 1px solid var(--rule);
+}
+.feature-card {
+  padding: 40px 36px;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  transition: background 0.2s;
+}
+.feature-card:hover { background: var(--paper); }
+.feature-icon {
+  font-size: 32px;
+  margin-bottom: 20px;
+  display: block;
+}
+.feature-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+.feature-card p {
+  font-size: 14px;
+  color: var(--mid);
+  line-height: 1.7;
+}
+.feature-tag {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: var(--ink);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+/* ── HOW IT WORKS ── */
+.how-section { background: var(--paper); }
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  margin-top: 60px;
+  position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rule), var(--rule), transparent);
+}
+.step {
+  text-align: center;
+  position: relative;
+}
+.step-num {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--gold);
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 1;
+  border: 3px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.step h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.step p {
+  font-size: 13px;
+  color: var(--mid);
+  line-height: 1.6;
+}
+
+/* ── PRICING ── */
+.pricing-section { background: var(--white); }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+  align-items: start;
+}
+.pricing-card {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 40px 36px;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.1); }
+.pricing-card.featured {
+  border-color: var(--gold);
+  border-width: 2px;
+  background: var(--ink);
+  color: var(--white);
+}
+.pricing-badge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 16px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.plan-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.plan-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.pricing-card.featured .plan-price { color: var(--white); }
+.plan-price sup { font-size: 24px; vertical-align: super; }
+.plan-period { font-size: 13px; color: #888; margin-bottom: 28px; }
+.pricing-card.featured .plan-period { color: #aaa; }
+.plan-features {
+  list-style: none;
+  margin-bottom: 32px;
+}
+.plan-features li {
+  font-size: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mid);
+}
+.pricing-card.featured .plan-features li {
+  border-color: #333;
+  color: #ccc;
+}
+.plan-features li::before {
+  content: '✓';
+  color: var(--green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.plan-features li.no::before { content: '✕'; color: #ccc; }
+.pricing-card.featured .plan-features li.no::before { color: #555; }
+.plan-btn {
+  width: 100%;
+  padding: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+}
+.plan-btn:hover { background: var(--ink); color: var(--gold); }
+.pricing-card.featured .plan-btn {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+.pricing-card.featured .plan-btn:hover { background: var(--gold-light); }
+.pricing-note {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--mid);
+}
+
+/* ── REGIONAL ── */
+.regional-section {
+  background: var(--ink);
+  padding: 80px 5vw;
+}
+.regional-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.regional-inner .section-title { color: var(--white); }
+.regional-inner .section-sub { color: #888; }
+.paper-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+.paper-tag {
+  background: #2a2a28;
+  border: 1px solid #333;
+  color: #ccc;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+.paper-tag.local {
+  background: rgba(200,168,75,0.1);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.regional-quote {
+  background: #2a2a28;
+  border-left: 3px solid var(--gold);
+  padding: 28px 32px;
+  border-radius: 0 4px 4px 0;
+}
+.regional-quote p {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--white);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.regional-quote cite {
+  font-size: 13px;
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── EARLY ACCESS / SIGNUP ── */
+.signup-section {
+  background: var(--paper);
+  text-align: center;
+}
+.signup-section .section-title { margin: 0 auto 16px; }
+.signup-section .section-sub { margin: 0 auto 40px; text-align: center; }
+.signup-form {
+  max-width: 480px;
+  margin: 0 auto;
+}
+.form-row {
+  display: flex;
+  gap: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+.form-row input {
+  flex: 1;
+  padding: 16px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  border: 2px solid var(--ink);
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+  background: var(--white);
+  color: var(--ink);
+  outline: none;
+}
+.form-row input:focus { border-color: var(--gold); }
+.form-row button {
+  padding: 16px 28px;
+  background: var(--ink);
+  color: var(--gold);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border: 2px solid var(--ink);
+  border-radius: 0 3px 3px 0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.form-row button:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.form-sub {
+  font-size: 12px;
+  color: var(--mid);
+  margin-top: 12px;
+}
+.signup-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 56px;
+  padding-top: 48px;
+  border-top: 1px solid var(--rule);
+}
+.signup-stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+.signup-stat-label {
+  font-size: 13px;
+  color: var(--mid);
+  margin-top: 4px;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  padding: 48px 5vw;
+  border-top: 3px solid var(--gold);
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--white);
+}
+.footer-logo span { color: var(--gold); }
+.footer-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+}
+.footer-links a {
+  font-size: 13px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--gold); }
+.footer-copy {
+  font-size: 12px;
+  color: #444;
+  width: 100%;
+  text-align: center;
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid #222;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.7s ease forwards; }
+.fade-up-2 { animation: fadeUp 0.7s 0.15s ease forwards; opacity: 0; }
+.fade-up-3 { animation: fadeUp 0.7s 0.3s ease forwards; opacity: 0; }
+.fade-up-4 { animation: fadeUp 0.7s 0.45s ease forwards; opacity: 0; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+  .app-preview { display: none; }
+  .problem-inner { grid-template-columns: 1fr; gap: 32px; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
+  .steps::before { display: none; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .regional-inner { grid-template-columns: 1fr; gap: 40px; }
+  .signup-stats { gap: 32px; flex-wrap: wrap; }
+  nav .nav-links { display: none; }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .form-row { flex-direction: column; }
+  .form-row input { border-right: 2px solid var(--ink); border-bottom: none; border-radius: 3px 3px 0 0; }
+  .form-row button { border-radius: 0 0 3px 3px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Newsagent<span>Delivr</span></a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#signup" class="nav-cta">Start Free Trial</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow fade-up">🗞 Built for independent newsagents</div>
+      <h1 class="fade-up-2">Run your round.<br><em>Not your paperwork.</em></h1>
+      <p class="hero-sub fade-up-3">Delivery rounds, customer billing, shop invoicing and weekly reports — all in one modern app that works on any phone, tablet or computer. No installation. No training. Just open and go.</p>
+      <div class="hero-actions fade-up-4">
+        <a href="#signup" class="btn-primary">Start 30-day free trial</a>
+        <a href="#how" class="btn-secondary">See how it works →</a>
+      </div>
+      <div class="hero-trust fade-up-4">
+        <span>No credit card needed</span>
+        <span>Works on iPhone & Android</span>
+        <span>We'll set it up for you</span>
+      </div>
+    </div>
+    <div class="app-preview fade-up-3">
+      <div class="app-bar">
+        <div class="app-dots"><span></span><span></span><span></span></div>
+        <div class="app-title-bar">NEWSAGENTDELIVR</div>
+      </div>
+      <div class="app-nav-mock">
+        <span class="active">⊞ Dashboard</span>
+        <span>👥 Customers</span>
+        <span>🚲 Rounds</span>
+        <span>£ Billing</span>
+        <span>🏪 Shop</span>
+      </div>
+      <div class="app-stat-row">
+        <div class="app-stat">
+          <div class="app-stat-label">Customers</div>
+          <div class="app-stat-val">47</div>
+          <div class="app-stat-sub">Active deliveries</div>
+        </div>
+        <div class="app-stat">
+          <div class="app-stat-label">This week</div>
+          <div class="app-stat-val">£312</div>
+          <div class="app-stat-sub">Outstanding</div>
+        </div>
+        <div class="app-stat">
+          <div class="app-stat-label">Shop bill</div>
+          <div class="app-stat-val">£934</div>
+          <div class="app-stat-sub">Ready to send</div>
+        </div>
+      </div>
+      <div class="app-row delivered">
+        <div>
+          <div class="app-row-name">MR & MRS RICHMOND</div>
+          <div class="app-row-detail">Daily Mail · Radio Times · Delivered</div>
+        </div>
+        <div class="app-row-amount">£18.40</div>
+      </div>
+      <div class="app-row delivered">
+        <div>
+          <div class="app-row-name">MRS SAVIDENT</div>
+          <div class="app-row-detail">The Times · Hello! · Delivered</div>
+        </div>
+        <div class="app-row-amount">£34.20</div>
+      </div>
+      <div class="app-row pending">
+        <div>
+          <div class="app-row-name">MR J DOMAILLE</div>
+          <div class="app-row-detail">Sun · Womans Weekly · Bill pending</div>
+        </div>
+        <div class="app-row-amount">£12.80</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM STRIP -->
+<div class="problem-strip">
+  <div class="problem-inner">
+    <div class="problem-item">
+      <div class="strike">✕</div>
+      <h3>Spreadsheets that break</h3>
+      <p>Hours spent on Excel every week, manually calculating bills, chasing errors and sending invoices one by one.</p>
+    </div>
+    <div class="problem-item">
+      <div class="strike">✕</div>
+      <h3>Software from 2003</h3>
+      <p>Clunky desktop programs that don't work on your phone, can't be accessed away from the office, and look like Windows XP.</p>
+    </div>
+    <div class="problem-item">
+      <div class="strike">✕</div>
+      <h3>Big chain solutions</h3>
+      <p>Enterprise software built for WH Smith, priced for WH Smith. Completely wrong for an independent with 30–80 customers.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-inner">
+    <div class="section-label">Everything you need</div>
+    <h2 class="section-title">Built around how a real<br>newsagent actually works</h2>
+    <p class="section-sub">Every feature comes from real newsagent workflows — not guesswork. No bloat, no features you'll never use.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🚲</span>
+        <h3>Delivery Rounds</h3>
+        <p>Organise customers into rounds, set delivery order, track which papers go where. Driver view shows only what they need — nothing more.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📋</span>
+        <h3>Customer Billing</h3>
+        <p>Automatic weekly and monthly bills for every customer. Itemised or summary format. Email direct from the app with one tap.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏪</span>
+        <h3>Shop Invoicing</h3>
+        <div class="feature-tag">New</div>
+        <p>Weekly supply sheet for your Alliance or distributor account. Separate newspaper and magazine discounts calculated automatically.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📷</span>
+        <h3>Scan Handwritten Sheets</h3>
+        <div class="feature-tag">Unique</div>
+        <p>Photograph your handwritten daily delivery notes and the app reads the numbers for you. Deliveries, returns and prices — all filled in automatically.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">☁</span>
+        <h3>Works on Every Device</h3>
+        <p>Enter figures on your phone in the morning, check totals on your iPad at lunch, print invoices on your desktop in the evening. All in sync.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📅</span>
+        <h3>Holidays & Calendar</h3>
+        <p>Set customer holidays, bank holidays and delivery changes. Bills automatically adjust so you never overcharge for a missed delivery.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📦</span>
+        <h3>Stock Management</h3>
+        <p>Track all your titles — daily papers, Saturday editions, Sunday papers and weekly magazines — with cost price, sell price and margin.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💰</span>
+        <h3>GST / Tax Ready</h3>
+        <p>Enable GST on customer bills with your registration number. Separate rates for papers and magazines handled correctly.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">✉</span>
+        <h3>One-tap Emailing</h3>
+        <p>Every invoice opens your mail app pre-addressed, pre-written with a professional breakdown. From your business email address every time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-inner">
+    <div class="section-label">Getting started</div>
+    <h2 class="section-title">Up and running<br>in under an hour</h2>
+    <p class="section-sub">No IT knowledge needed. If you can use a smartphone you can use NewsagentDelivr.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Sign up free</h3>
+        <p>Create your account in 60 seconds. No credit card. 30 days completely free.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>We set it up</h3>
+        <p>Send us your customer list — even a handwritten one — and we'll enter everything for you.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Start delivering</h3>
+        <p>Open the app on any device. Your rounds, customers and papers are all there ready to go.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Send invoices</h3>
+        <p>Bills generate automatically. One tap to email your customers and your distributor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REGIONAL PAPERS -->
+<div class="regional-section">
+  <div class="regional-inner">
+    <div>
+      <div class="section-label" style="color:var(--gold)">Works everywhere</div>
+      <h2 class="section-title">Your local paper.<br>Already supported.</h2>
+      <p class="section-sub" style="color:#888">Add any regional or local title alongside the nationals. From the Guernsey Press to the Yorkshire Post — if you deliver it, we can track it.</p>
+      <div class="paper-list">
+        <span class="paper-tag">The Sun</span>
+        <span class="paper-tag">Daily Mail</span>
+        <span class="paper-tag">The Times</span>
+        <span class="paper-tag">Daily Mirror</span>
+        <span class="paper-tag">Daily Express</span>
+        <span class="paper-tag local">Guernsey Press</span>
+        <span class="paper-tag local">Your Local Paper +</span>
+        <span class="paper-tag">+ Any title</span>
+      </div>
+    </div>
+    <div class="regional-quote">
+      <p>"I scan my handwritten delivery sheet every morning and the app fills everything in. My weekly Alliance invoice used to take me an hour — now it takes five minutes."</p>
+      <cite>— Craig Torode, C J Torode Newsagent, Guernsey</cite>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Simple pricing</div>
+    <h2 class="section-title">One price.<br>No surprises.</h2>
+    <p class="section-sub">Cancel any time. No contracts. Price per newsagent business, not per user — your drivers can log in too.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><sup>£</sup>9</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features">
+          <li>Up to 50 customers</li>
+          <li>2 delivery rounds</li>
+          <li>Customer billing & invoicing</li>
+          <li>Email invoices</li>
+          <li>Cloud sync — all devices</li>
+          <li class="no">Shop / distributor invoicing</li>
+          <li class="no">Handwritten sheet scanning</li>
+          <li class="no">Free setup service</li>
+        </ul>
+        <a href="#signup" class="plan-btn">Start free trial</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><sup>£</sup>19</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features">
+          <li>Unlimited customers</li>
+          <li>Unlimited rounds</li>
+          <li>Customer billing & invoicing</li>
+          <li>Email invoices</li>
+          <li>Cloud sync — all devices</li>
+          <li>Shop / distributor invoicing</li>
+          <li>Handwritten sheet scanning</li>
+          <li>Free setup service included</li>
+        </ul>
+        <a href="#signup" class="plan-btn">Start free trial</a>
+      </div>
+      <div class="pricing-card">
+        <div class="plan-name">Setup Only</div>
+        <div class="plan-price"><sup>£</sup>65</div>
+        <div class="plan-period">one-off fee</div>
+        <ul class="plan-features">
+          <li>We enter all your customers</li>
+          <li>We set up your rounds</li>
+          <li>We add all your stock titles</li>
+          <li>We configure your pricing</li>
+          <li>Includes first month Pro free</li>
+          <li class="no">Ongoing subscription separate</li>
+          <li class="no">—</li>
+          <li class="no">—</li>
+        </ul>
+        <a href="#signup" class="plan-btn">Get in touch</a>
+      </div>
+    </div>
+    <p class="pricing-note">All plans include a 30-day free trial · No credit card required to start · Cancel any time</p>
+  </div>
+</section>
+
+<!-- SIGNUP -->
+<section class="signup-section" id="signup">
+  <div class="section-inner">
+    <div class="section-label">Early access</div>
+    <h2 class="section-title" style="max-width:600px">Join the waitlist.<br>Be first in line.</h2>
+    <p class="section-sub">NewsagentDelivr is launching soon. Join the waitlist and get 3 months free when we go live — plus we'll set up your account for free.</p>
+    <div class="signup-form">
+      <div class="form-row">
+        <input type="email" placeholder="Your email address" id="signup-email"/>
+        <button onclick="handleSignup()">Join Waitlist →</button>
+      </div>
+      <p class="form-sub">No spam. We'll only email you when we launch. Unsubscribe any time.</p>
+    </div>
+    <div id="signup-thanks" style="display:none;margin-top:20px;padding:16px 24px;background:#f3fff3;border:1px solid #80a880;border-radius:4px;font-size:15px;color:#2a5e2a;max-width:480px;margin-left:auto;margin-right:auto">
+      ✓ You're on the list! We'll be in touch when we launch.
+    </div>
+    <div class="signup-stats">
+      <div>
+        <div class="signup-stat-val">4,500+</div>
+        <div class="signup-stat-label">Independent newsagents in the UK</div>
+      </div>
+      <div>
+        <div class="signup-stat-val">30</div>
+        <div class="signup-stat-label">Days free trial, no card needed</div>
+      </div>
+      <div>
+        <div class="signup-stat-val">£0</div>
+        <div class="signup-stat-label">Setup cost with Pro plan</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Newsagent<span>Delivr</span></div>
+    <ul class="footer-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#signup">Sign Up</a></li>
+      <li><a href="mailto:hello@newsagentdelivr.com">Contact</a></li>
+    </ul>
+  </div>
+  <div class="footer-inner">
+    <p class="footer-copy">© 2026 NewsagentDelivr. Built for independent newsagents. · <a href="#" style="color:#444;text-decoration:none">Privacy Policy</a> · <a href="#" style="color:#444;text-decoration:none">Terms</a></p>
+  </div>
+</footer>
+
+<script>
+function handleSignup(){
+  const email = document.getElementById('signup-email').value.trim();
+  if(!email || !email.includes('@')){
+    alert('Please enter a valid email address.');
+    return;
+  }
+  document.querySelector('.form-row').style.display = 'none';
+  document.getElementById('signup-thanks').style.display = 'block';
+  // In production this would POST to your backend / Mailchimp / ConvertKit etc
+  console.log('Signup:', email);
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); }
+  });
+});
+
+// Enter key on signup form
+document.getElementById('signup-email').addEventListener('keydown', e => {
+  if(e.key === 'Enter') handleSignup();
+});
+</script>
+</body>
+</html>
